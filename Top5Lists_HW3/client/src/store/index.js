@@ -101,8 +101,8 @@ export const useGlobalStore = () => {
             // ADD A NEW LIST
             case GlobalStoreActionType.ADD_NEW_LIST: {
                 return setStore({
-                    idNamePairs: payload,
-                    currentList: null,
+                    idNamePairs: payload[0],
+                    currentList: payload[1],
                     newListCounter: store.newListCounter + 1,
                     isListNameEditActive: false,
                     isItemEditActive: false,
@@ -158,25 +158,27 @@ export const useGlobalStore = () => {
         });
     }
 
-    // THIS FUNCTION CREATES A NEW LIST AND INCREMENTS THE NEW LIST COUNTER
+    // THIS FUNCTION CREATES A NEW LIST, SETS IT AS THE CURRENT LIST, AND INCREMENTS THE NEW LIST COUNTER
     store.addNewList = function () {
         async function asyncAddNewList(){
             let count = store.newListCounter;
-            await api.createTop5List({
+            let newList = {
                 "name": "Untitled" + count,
                 "items": ["?", "?", "?", "?", "?"]
-            });
+            }
+            await api.createTop5List(newList);
             const response = await api.getTop5ListPairs();
             if (response.data.success) {
                 let pairsArray = response.data.idNamePairs;
                 storeReducer({
                     type: GlobalStoreActionType.ADD_NEW_LIST,
-                    payload: pairsArray
+                    payload: [pairsArray, newList]
                 });
             }
             else {
                 console.log("API FAILED TO GET THE LIST PAIRS");
             }
+            store.history.push("/top5list/" + newList._id);
         }
         asyncAddNewList();
     }
