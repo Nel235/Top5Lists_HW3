@@ -2,6 +2,7 @@ import { createContext, useState } from 'react'
 import jsTPS from '../common/jsTPS'
 import api from '../api'
 import MoveItem_Transaction from '../transactions/MoveItem_Transaction'
+import ChangeItem_Transaction from '../transactions/ChangeItem_Transaction'
 import { ListCard } from '../components';
 export const GlobalStoreContext = createContext({});
 /*
@@ -19,6 +20,7 @@ export const GlobalStoreActionType = {
     LOAD_ID_NAME_PAIRS: "LOAD_ID_NAME_PAIRS",
     SET_CURRENT_LIST: "SET_CURRENT_LIST",
     SET_LIST_NAME_EDIT_ACTIVE: "SET_LIST_NAME_EDIT_ACTIVE",
+    SET_ITEM_NAME_EDIT_ACTIVE: "SET_ITEM_NAME_EDIT_ACTIVE",
     ADD_NEW_LIST: "ADD_NEW_LIST"
 }
 
@@ -95,6 +97,17 @@ export const useGlobalStore = () => {
                     newListCounter: store.newListCounter,
                     isListNameEditActive: true,
                     isItemEditActive: false,
+                    listMarkedForDeletion: null
+                });
+            }
+            // START EDITING AN ITEM NAME
+            case GlobalStoreActionType.SET_ITEM_NAME_EDIT_ACTIVE: {
+                return setStore({
+                    idNamePairs: store.idNamePairs,
+                    currentList: store.currentList,
+                    newListCounter: store.newListCounter,
+                    isListNameEditActive: false,
+                    isItemEditActive: true,
                     listMarkedForDeletion: null
                 });
             }
@@ -227,6 +240,10 @@ export const useGlobalStore = () => {
         let transaction = new MoveItem_Transaction(store, start, end);
         tps.addTransaction(transaction);
     }
+    store.addChangeItemTransaction = function (id, oldText, newText) {
+        let transaction = new ChangeItem_Transaction(store, id, oldText, newText);
+        tps.addTransaction(transaction);
+    }
     store.moveItem = function (start, end) {
         start -= 1;
         end -= 1;
@@ -246,6 +263,11 @@ export const useGlobalStore = () => {
         }
 
         // NOW MAKE IT OFFICIAL
+        store.updateCurrentList();
+    }
+    store.changeItem = function (id, newText) {
+        let index = store.currentList.items.findIndex(x => x.id === id);
+        store.currentList.items[index] = newText;
         store.updateCurrentList();
     }
     store.updateCurrentList = function() {
@@ -271,6 +293,13 @@ export const useGlobalStore = () => {
     store.setIsListNameEditActive = function () {
         storeReducer({
             type: GlobalStoreActionType.SET_LIST_NAME_EDIT_ACTIVE,
+            payload: null
+        });
+    }
+
+    store.setIsItemNameEditActive = function () {
+        storeReducer({
+            type: GlobalStoreActionType.SET_ITEM_NAME_EDIT_ACTIVE,
             payload: null
         });
     }
