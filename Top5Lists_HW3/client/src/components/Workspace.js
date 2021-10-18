@@ -28,6 +28,9 @@ function Workspace() {
                 }
             </div>;
     }
+    else if(!store.currentList){
+        window.location.replace("\\")
+    }
     return (
         <div id="top5-workspace">
             <div id="workspace-edit">
