@@ -266,7 +266,7 @@ export const useGlobalStore = () => {
         store.updateCurrentList();
     }
     store.changeItem = function (id, newText) {
-        let index = store.currentList.items.findIndex(x => x.id === id);
+        let index = store.currentList.items.findIndex(x => x === id);
         store.currentList.items[index] = newText;
         store.updateCurrentList();
     }

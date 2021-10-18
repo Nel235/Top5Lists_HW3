@@ -60,8 +60,8 @@ function Top5Item(props) {
 
     function handleKeyPress(event) {
         if (event.code === "Enter") {
-            let id = event.target.id.substring("item-".length);
-            store.changeItem(id, text);
+            let id = props.text;
+            store.changeItem(id, event.target.value);
             toggleEdit();
         }
     }
@@ -70,7 +70,7 @@ function Top5Item(props) {
         setText(event.target.value );
     }
 
-    let { index } = props;
+    let { index} = props;
     let itemClass = "top5-item";
     if (draggedTo) {
         itemClass = "top5-item-dragged-to";
@@ -79,7 +79,6 @@ function Top5Item(props) {
     if (store.isItemNameEditActive) {
         cardStatus = true;
     }
-    
     if (editActive) {
         return(
             <input
@@ -89,8 +88,10 @@ function Top5Item(props) {
                 autoFocus
                 onKeyPress={handleKeyPress}
                 onChange={handleUpdateText}
+                onBlur={toggleEdit}
                 defaultValue={props.text}
-            />)
+            />
+            )
     }
     return (
         <div
