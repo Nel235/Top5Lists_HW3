@@ -240,8 +240,8 @@ export const useGlobalStore = () => {
         let transaction = new MoveItem_Transaction(store, start, end);
         tps.addTransaction(transaction);
     }
-    store.addChangeItemTransaction = function (id, oldText, newText) {
-        let transaction = new ChangeItem_Transaction(store, id, oldText, newText);
+    store.addChangeItemTransaction = function (oldText, newText) {
+        let transaction = new ChangeItem_Transaction(store, oldText, newText);
         tps.addTransaction(transaction);
     }
     store.moveItem = function (start, end) {
