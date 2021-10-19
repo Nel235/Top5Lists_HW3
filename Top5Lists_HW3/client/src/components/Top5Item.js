@@ -82,24 +82,13 @@ function Top5Item(props) {
         itemClass = "top5-item-dragged-to";
     }
     let cardStatus = false;
+    let buttonType = "list-card-button";
     if (editActive) {
         cardStatus = true;
     }
-    if (editActive) {
-        return(
-            <input
-                id={"item-" + (index+1)}
-                className='list-card'
-                type='text'
-                autoFocus
-                onKeyPress={handleKeyPress}
-                onChange={handleUpdateText}
-                onBlur={toggleEdit}
-                defaultValue={props.text}
-            />
-            )
-    }
-    return (
+    else if(!editActive&&store.isItemEditActive)
+        buttonType = "top5-button-disabled";
+    let cardElement = (
         <div
             id={'item-' + (index + 1)}
             className={itemClass}
@@ -114,12 +103,26 @@ function Top5Item(props) {
                 type="button"
                 disabled={cardStatus}
                 id={"edit-item-" + index + 1}
-                className="list-card-button"
+                className={(buttonType)}
                 onClick = {handleToggleEdit}
                 value={"\u270E"}
             />
             {props.text}
         </div>)
+    if (editActive) {
+        cardElement = 
+            <input
+                id={"item-" + (index+1)}
+                className='list-card'
+                type='text'
+                autoFocus
+                onKeyPress={handleKeyPress}
+                onChange={handleUpdateText}
+                onBlur={toggleEdit}
+                defaultValue={props.text}
+            />
+    }
+    return cardElement;
 }
 
 export default Top5Item;
