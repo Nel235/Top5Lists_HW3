@@ -36,13 +36,16 @@ function ListCard(props) {
         if (newActive) {
             store.setIsListNameEditActive();
         }
+        else
+            store.closeCurrentList()
         setEditActive(newActive);
     }
 
     function handleKeyPress(event) {
         if (event.code === "Enter") {
             let id = event.target.id.substring("list-".length);
-            store.changeListName(id, text);
+            if(text != "")
+                store.changeListName(id, text);
             toggleEdit();
         }
     }
@@ -94,6 +97,7 @@ function ListCard(props) {
                 id={"list-" + idNamePair._id}
                 className='list-card'
                 type='text'
+                autoFocus
                 onKeyPress={handleKeyPress}
                 onChange={handleUpdateText}
                 defaultValue={idNamePair.name}

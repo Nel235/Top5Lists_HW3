@@ -42,7 +42,10 @@ function Top5Item(props) {
         setDraggedTo(false);
 
         // UPDATE THE LIST
-        store.addMoveItemTransaction(sourceId, targetId);
+        if(sourceId!=targetId)
+            store.addMoveItemTransaction(sourceId, targetId);
+        else
+            store.updateCurrentList();    
     }
 
     function handleToggleEdit(event) {
@@ -61,8 +64,10 @@ function Top5Item(props) {
     function handleKeyPress(event) {
         if (event.code === "Enter") {
             let id = props.text;
-            if(!id===event.target.value)
+            if(id!=event.target.value)
                 store.addChangeItemTransaction(id, event.target.value);
+            else
+                store.updateCurrentList();
             toggleEdit();
         }
     }
@@ -77,7 +82,7 @@ function Top5Item(props) {
         itemClass = "top5-item-dragged-to";
     }
     let cardStatus = false;
-    if (store.isItemNameEditActive) {
+    if (editActive) {
         cardStatus = true;
     }
     if (editActive) {
