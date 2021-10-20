@@ -17,13 +17,18 @@ function DeleteModal() {
     }
     function handleDeleteList(event) {
         store.deleteMarkedList();
+        store.hideDeleteListModal();
+        store.loadIdNamePairs();
     }
     function handleCloseModal(event) {
         store.hideDeleteListModal();
     }
+    let visibility = ""
+    if(store.listMarkedForDeletion != null)
+        visibility = " is-visible";
     return (
         <div
-            className="modal"
+            className={"modal"+visibility}
             id="delete-modal"
             data-animation="slideInOutLeft">
             <div className="modal-dialog">

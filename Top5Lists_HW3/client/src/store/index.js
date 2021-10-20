@@ -67,6 +67,17 @@ export const useGlobalStore = () => {
                     listMarkedForDeletion: null
                 })
             }
+            // MARK A LIST FOR DELETION
+            case GlobalStoreActionType.MARK_CURRENT_LIST: {
+                return setStore({
+                    idNamePairs: store.idNamePairs,
+                    currentList: payload[1],
+                    newListCounter: store.newListCounter,
+                    isListNameEditActive: false,
+                    isItemEditActive: false,
+                    listMarkedForDeletion: payload[0]
+                })
+            }
             // GET ALL THE LISTS SO WE CAN PRESENT THEM
             case GlobalStoreActionType.LOAD_ID_NAME_PAIRS: {
                 return setStore({
@@ -117,6 +128,18 @@ export const useGlobalStore = () => {
                     idNamePairs: payload[0],
                     currentList: payload[1],
                     newListCounter: store.newListCounter + 1,
+                    isListNameEditActive: false,
+                    isItemEditActive: false,
+                    listMarkedForDeletion: null
+                });
+            }
+
+            // DELETE A LIST
+            case GlobalStoreActionType.DELETE_LIST: {
+                return setStore({
+                    idNamePairs: payload,
+                    currentList: null,
+                    newListCounter: store.newListCounter,
                     isListNameEditActive: false,
                     isItemEditActive: false,
                     listMarkedForDeletion: null
@@ -307,11 +330,55 @@ export const useGlobalStore = () => {
         });
     }
 
+    // THIS FUNCTION ENABLES THE PROCESS OF EDITING AN ITEM NAME
     store.setIsItemNameEditActive = function () {
         storeReducer({
             type: GlobalStoreActionType.SET_ITEM_NAME_EDIT_ACTIVE,
             payload: null
         });
+    }
+
+    // THIS FUNCTION ENABLES THE PROCESS OF DELETING A LIST
+    store.markListForDeletion = function (id) {
+        // GET THE LIST
+        async function asyncMarkListForDeletion(id) {
+            let response = await api.getTop5ListById(id);
+            if (response.data.success) {
+                let top5List = response.data.top5List;
+                response = await api.updateTop5ListById(top5List._id, top5List);
+                if (response.data.success) {
+                    storeReducer({
+                        type: GlobalStoreActionType.MARK_CURRENT_LIST,
+                        payload: [id, top5List]
+                    });
+                }
+            }
+        }
+        asyncMarkListForDeletion(id);
+    }
+
+    // THIS FUNCTION HIDES THE DELETE MODAL
+    store.hideDeleteListModal = function() {
+        store.closeCurrentList();
+    }
+
+    // THIS FUNCTION DELETES THE MARKED LIST
+    store.deleteMarkedList = function() {
+        async function asyncDeleteMarkedList(){
+            await api.deleteTop5ListById(store.listMarkedForDeletion);
+            const response = await api.getTop5ListPairs();
+            if (response.data.success) {
+                let pairsArray = response.data.idNamePairs;
+                storeReducer({
+                    type: GlobalStoreActionType.DELETE_LIST,
+                    payload: pairsArray
+                });
+            }
+            else {
+                console.log("API FAILED TO GET THE LIST PAIRS");
+            }
+        }
+        asyncDeleteMarkedList();
     }
 
     // THIS GIVES OUR STORE AND ITS REDUCER TO ANY COMPONENT THAT NEEDS IT
